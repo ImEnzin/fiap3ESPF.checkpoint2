@@ -1,0 +1,563 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerenciador de Pedidos</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+    header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header .logo { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+    header .subtitle { font-size: 13px; opacity: 0.8; }
+
+    .tabs {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      padding: 0 40px;
+      gap: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .tab {
+      padding: 14px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: #6b7280;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab:hover { color: #4f46e5; }
+    .tab.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 6px;
+    }
+    .page-desc {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border: 1px solid #f3f4f6;
+    }
+
+    h2 { font-size: 16px; margin-bottom: 18px; color: #374151; font-weight: bold; }
+
+    .form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 180px; }
+    label { font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #374151; }
+    input, select {
+      padding: 10px 13px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      background: #fafafa;
+    }
+    input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); background: white; }
+
+    .btn-row { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+    button {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    button:active { transform: translateY(0); }
+    .btn-primary { background: #4f46e5; color: white; }
+    .btn-danger  { background: #ef4444; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-ghost   { background: #f3f4f6; color: #374151; }
+
+    .msg {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 14px;
+      font-size: 14px;
+      display: none;
+      font-weight: 500;
+    }
+    .msg.ok  { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; display: block; }
+    .msg.err { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; display: block; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: #f9fafb; padding: 11px 16px; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px 16px; border-top: 1px solid #f3f4f6; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+
+    .badge {
+      background: #ede9fe;
+      color: #4f46e5;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .action-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      margin-right: 4px;
+    }
+    .action-btn:hover { transform: none; box-shadow: none; opacity: 0.85; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+    .empty-state p { font-size: 15px; }
+
+    .result-box {
+      background: #f9fafb;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .result-row { display: flex; gap: 8px; margin-bottom: 10px; font-size: 14px; }
+    .result-row:last-child { margin-bottom: 0; }
+    .result-label { font-weight: bold; color: #6b7280; min-width: 130px; }
+    .result-value { color: #1f2937; }
+
+    .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 24px;
+      flex: 1;
+      min-width: 140px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border: 1px solid #f3f4f6;
+    }
+    .stat-label { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 28px; font-weight: bold; color: #4f46e5; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">📦 Gerenciador de Pedidos</div>
+    <div class="subtitle">Sistema de gerenciamento via API REST</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="mudarAba('inicio')">🏠 Início</div>
+  <div class="tab" onclick="mudarAba('criar')">➕ Criar Pedido</div>
+  <div class="tab" onclick="mudarAba('listar')">📋 Listar Pedidos</div>
+  <div class="tab" onclick="mudarAba('buscar')">🔍 Buscar por ID</div>
+</div>
+
+<!-- ABA: INÍCIO -->
+<div id="page-inicio" class="page active">
+  <div class="container">
+    <div class="page-title">Bem-vindo ao Sistema de Pedidos</div>
+    <div class="page-desc">Gerencie todos os pedidos da sua loja em um só lugar.</div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total de Pedidos</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Valor Total (R$)</div>
+        <div class="stat-value" id="stat-valor">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Último Pedido</div>
+        <div class="stat-value" id="stat-ultimo">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>O que você pode fazer</h2>
+      <table>
+        <thead><tr><th>Aba</th><th>Operação</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td>➕ Criar Pedido</td><td><span class="badge">POST</span></td><td>Cadastra um novo pedido no sistema</td></tr>
+          <tr><td>📋 Listar Pedidos</td><td><span class="badge">GET</span></td><td>Exibe todos os pedidos, com opção de editar e excluir</td></tr>
+          <tr><td>🔍 Buscar por ID</td><td><span class="badge">GET /{id}</span></td><td>Localiza um pedido específico pelo número ID</td></tr>
+          <tr><td>📋 Listar → Editar</td><td><span class="badge">PUT</span></td><td>Atualiza os dados de um pedido existente</td></tr>
+          <tr><td>📋 Listar → Excluir</td><td><span class="badge">DELETE</span></td><td>Remove permanentemente um pedido</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Informações da API</h2>
+      <div class="result-row"><span class="result-label">URL Base:</span><span class="result-value">http://localhost:8085</span></div>
+      <div class="result-row"><span class="result-label">Banco de Dados:</span><span class="result-value">H2 (arquivo local — dados persistentes)</span></div>
+      <div class="result-row"><span class="result-label">Console H2:</span><span class="result-value"><a href="/h2-console" target="_blank">http://localhost:8085/h2-console</a></span></div>
+      <div class="result-row"><span class="result-label">JDBC URL:</span><span class="result-value">jdbc:h2:file:~/testdb</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA: CRIAR -->
+<div id="page-criar" class="page">
+  <div class="container">
+    <div class="page-title">➕ Criar Novo Pedido</div>
+    <div class="page-desc">Preencha os campos abaixo para cadastrar um novo pedido. A data é preenchida automaticamente.</div>
+
+    <div class="card">
+      <h2>Dados do Pedido</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome do Cliente *</label>
+          <input type="text" id="nome" placeholder="Ex: João Silva" />
+        </div>
+        <div class="form-group">
+          <label for="valor">Valor Total (R$) *</label>
+          <input type="number" id="valor" placeholder="Ex: 150.00" step="0.01" min="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="data">Data do Pedido (opcional)</label>
+          <input type="date" id="data" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="criarPedido()">➕ Criar Pedido</button>
+        <button class="btn-ghost" onclick="limparFormCriar()">Limpar</button>
+      </div>
+      <div class="msg" id="msg-criar"></div>
+    </div>
+
+    <div class="card" id="card-resultado-criacao" style="display:none;">
+      <h2>✅ Pedido Criado com Sucesso</h2>
+      <div id="resultado-criacao"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA: LISTAR -->
+<div id="page-listar" class="page">
+  <div class="container">
+    <div class="page-title">📋 Todos os Pedidos</div>
+    <div class="page-desc">Lista completa de pedidos cadastrados. Clique em Editar ou Excluir para gerenciar.</div>
+
+    <!-- EDITAR (dentro da aba listar) -->
+    <div class="card" id="card-editar" style="display:none;">
+      <h2>✏️ Editar Pedido</h2>
+      <input type="hidden" id="edit-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-nome">Nome do Cliente *</label>
+          <input type="text" id="edit-nome" />
+        </div>
+        <div class="form-group">
+          <label for="edit-valor">Valor Total (R$) *</label>
+          <input type="number" id="edit-valor" step="0.01" min="0.01" />
+        </div>
+        <div class="form-group">
+          <label for="edit-data">Data do Pedido</label>
+          <input type="date" id="edit-data" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-warning" onclick="salvarEdicao()">💾 Salvar Alterações</button>
+        <button class="btn-ghost" onclick="document.getElementById('card-editar').style.display='none'">Cancelar</button>
+      </div>
+      <div class="msg" id="msg-editar"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">Pedidos Cadastrados</h2>
+        <button class="btn-success" style="padding:7px 16px;font-size:13px;" onclick="carregarPedidos()">🔄 Atualizar</button>
+      </div>
+      <div id="tabela-container">
+        <div class="empty-state"><div class="icon">⏳</div><p>Carregando...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA: BUSCAR POR ID -->
+<div id="page-buscar" class="page">
+  <div class="container">
+    <div class="page-title">🔍 Buscar Pedido por ID</div>
+    <div class="page-desc">Digite o número do ID para localizar um pedido específico.</div>
+
+    <div class="card">
+      <h2>Informe o ID</h2>
+      <div class="form-row">
+        <div class="form-group" style="max-width:200px;">
+          <label for="busca-id">ID do Pedido</label>
+          <input type="number" id="busca-id" placeholder="Ex: 1" min="1" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="buscarPorId()">🔍 Buscar</button>
+        <button class="btn-ghost" onclick="limparBusca()">Limpar</button>
+      </div>
+      <div class="msg" id="msg-buscar"></div>
+    </div>
+
+    <div class="card" id="card-resultado-busca" style="display:none;">
+      <h2>Resultado</h2>
+      <div id="resultado-busca"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:8085/orders';
+
+  function mudarAba(aba) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + aba).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if (aba === 'listar') carregarPedidos();
+    if (aba === 'inicio') carregarStats();
+  }
+
+  async function carregarStats() {
+    try {
+      const res = await fetch(API);
+      const pedidos = await res.json();
+      document.getElementById('stat-total').textContent = pedidos.length;
+      const total = pedidos.reduce((s, p) => s + parseFloat(p.totalValue || 0), 0);
+      document.getElementById('stat-valor').textContent = total.toFixed(2);
+      if (pedidos.length > 0) {
+        const ultimo = pedidos[pedidos.length - 1];
+        document.getElementById('stat-ultimo').textContent = '#' + ultimo.id;
+      } else {
+        document.getElementById('stat-ultimo').textContent = '—';
+      }
+    } catch (e) {}
+  }
+
+  async function carregarPedidos() {
+    const container = document.getElementById('tabela-container');
+    try {
+      const res = await fetch(API);
+      const pedidos = await res.json();
+
+      if (!pedidos.length) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Nenhum pedido cadastrado ainda.</p></div>';
+        return;
+      }
+
+      let html = `<table>
+        <thead><tr>
+          <th>ID</th><th>Cliente</th><th>Data</th><th>Valor</th><th>Ações</th>
+        </tr></thead><tbody>`;
+
+      for (const p of pedidos) {
+        html += `<tr>
+          <td><span class="badge">#${p.id}</span></td>
+          <td>${p.clientName}</td>
+          <td>${p.orderDate ? formatarData(p.orderDate) : '-'}</td>
+          <td><strong>R$ ${parseFloat(p.totalValue).toFixed(2)}</strong></td>
+          <td>
+            <button class="btn-warning action-btn" onclick="abrirEdicao(${p.id},'${p.clientName.replace(/'/g,"\\'")}'  ,${p.totalValue},'${p.orderDate}')">✏️ Editar</button>
+            <button class="btn-danger action-btn" onclick="deletarPedido(${p.id})">🗑️ Excluir</button>
+          </td>
+        </tr>`;
+      }
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>Erro ao conectar na API. A aplicação está rodando?</p></div>';
+    }
+  }
+
+  async function criarPedido() {
+    const nome  = document.getElementById('nome').value.trim();
+    const valor = document.getElementById('valor').value;
+    const data  = document.getElementById('data').value;
+    const msg   = document.getElementById('msg-criar');
+
+    if (!nome || !valor) {
+      mostrarMsg(msg, 'Preencha o nome do cliente e o valor.', false);
+      return;
+    }
+
+    const body = { clientName: nome, totalValue: parseFloat(valor) };
+    if (data) body.orderDate = data;
+
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        const p = await res.json();
+        mostrarMsg(msg, `Pedido #${p.id} criado com sucesso!`, true);
+        limparFormCriar();
+        const box = document.getElementById('card-resultado-criacao');
+        box.style.display = 'block';
+        document.getElementById('resultado-criacao').innerHTML = renderPedido(p);
+      } else {
+        const err = await res.text();
+        mostrarMsg(msg, 'Erro: ' + err, false);
+      }
+    } catch (e) {
+      mostrarMsg(msg, 'Erro ao conectar na API.', false);
+    }
+  }
+
+  function limparFormCriar() {
+    document.getElementById('nome').value = '';
+    document.getElementById('valor').value = '';
+    document.getElementById('data').value = '';
+  }
+
+  function abrirEdicao(id, nome, valor, data) {
+    const card = document.getElementById('card-editar');
+    card.style.display = 'block';
+    document.getElementById('edit-id').value   = id;
+    document.getElementById('edit-nome').value  = nome;
+    document.getElementById('edit-valor').value = valor;
+    document.getElementById('edit-data').value  = data || '';
+    card.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function salvarEdicao() {
+    const id    = document.getElementById('edit-id').value;
+    const nome  = document.getElementById('edit-nome').value.trim();
+    const valor = document.getElementById('edit-valor').value;
+    const data  = document.getElementById('edit-data').value;
+    const msg   = document.getElementById('msg-editar');
+
+    if (!nome || !valor) {
+      mostrarMsg(msg, 'Preencha todos os campos obrigatórios.', false);
+      return;
+    }
+
+    const body = { clientName: nome, totalValue: parseFloat(valor) };
+    if (data) body.orderDate = data;
+
+    try {
+      const res = await fetch(`${API}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        mostrarMsg(msg, 'Pedido atualizado com sucesso!', true);
+        setTimeout(() => { document.getElementById('card-editar').style.display = 'none'; }, 1500);
+        carregarPedidos();
+      } else {
+        mostrarMsg(msg, 'Erro ao atualizar.', false);
+      }
+    } catch (e) {
+      mostrarMsg(msg, 'Erro ao conectar na API.', false);
+    }
+  }
+
+  async function deletarPedido(id) {
+    if (!confirm(`Confirma a exclusão do pedido #${id}?`)) return;
+    try {
+      const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        carregarPedidos();
+      } else {
+        alert('Erro ao deletar o pedido.');
+      }
+    } catch (e) {
+      alert('Erro ao conectar na API.');
+    }
+  }
+
+  async function buscarPorId() {
+    const id  = document.getElementById('busca-id').value;
+    const msg = document.getElementById('msg-buscar');
+    const box = document.getElementById('card-resultado-busca');
+
+    if (!id) {
+      mostrarMsg(msg, 'Digite um ID para buscar.', false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/${id}`);
+      if (res.ok) {
+        const p = await res.json();
+        box.style.display = 'block';
+        document.getElementById('resultado-busca').innerHTML = renderPedido(p);
+        document.getElementById('msg-buscar').className = 'msg';
+      } else {
+        box.style.display = 'none';
+        mostrarMsg(msg, `Pedido #${id} não encontrado.`, false);
+      }
+    } catch (e) {
+      mostrarMsg(msg, 'Erro ao conectar na API.', false);
+    }
+  }
+
+  function limparBusca() {
+    document.getElementById('busca-id').value = '';
+    document.getElementById('card-resultado-busca').style.display = 'none';
+    document.getElementById('msg-buscar').className = 'msg';
+  }
+
+  function renderPedido(p) {
+    return `<div class="result-box">
+      <div class="result-row"><span class="result-label">ID:</span><span class="result-value"><span class="badge">#${p.id}</span></span></div>
+      <div class="result-row"><span class="result-label">Cliente:</span><span class="result-value">${p.clientName}</span></div>
+      <div class="result-row"><span class="result-label">Data do Pedido:</span><span class="result-value">${p.orderDate ? formatarData(p.orderDate) : '-'}</span></div>
+      <div class="result-row"><span class="result-label">Valor Total:</span><span class="result-value"><strong>R$ ${parseFloat(p.totalValue).toFixed(2)}</strong></span></div>
+    </div>`;
+  }
+
+  function mostrarMsg(el, texto, ok) {
+    el.textContent = texto;
+    el.className = 'msg ' + (ok ? 'ok' : 'err');
+    setTimeout(() => { el.className = 'msg'; }, 4000);
+  }
+
+  function formatarData(data) {
+    const [y, m, d] = data.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  carregarStats();
+</script>
+</body>
+</html>

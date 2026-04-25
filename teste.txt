@@ -1,0 +1,183 @@
+1. Crie um projeto com o generator “Spring Boot”, selecionando o build automation “Maven” e nomeie-o como “Checkpoint1”, definindo o Group como “br.com.fiap”, o JKD “21”, o Java “21”, o Packaging “Jar” e carregando as seguintes dependências: “Spring Boot DevTools”, “Lombok”, “Spring Web”, “Spring Data JPA”, “H2 Database” e “Validation”;
+
+2. Analise a estrutura criada automaticamente e observe a classe Checkpoint1Application;
+
+_Esse é o ponto de entrada do programa, ini-_ _cializa os componentes e pode fazer a liga-_ _ção entre as camadas. Note inclusive, a ano-_ _tação @SpringBootApplication sobre a de-_ _claração da classe._
+
+3. Crie um pacote, dentro de “br.com.fiap.checkpoint1”, denominado “model”;
+
+4. Crie uma classe, dentro de “model”, denominada “OrderModel”;
+
+5. Crie uma variável, em “OrderModel”, com modificador de acesso “private”, do tipo “Long”, denominada “id”;
+
+6. Crie uma variável, em “OrderModel”, com modificador de acesso “private”, do tipo “String”, denominada “clientName”;
+
+7. Crie uma variável, em “OrderModel”, com modificador de acesso “private, do tipo “LocalDate”, denominada “orderDate”;
+
+8. Crie uma variável, em “OrderModel”, com modificador de acesso “private”, do tipo “BigDecimal”, denominada “totalValue”;
+
+9. Na classe “OrderModel”, crie um método, com modificador de acesso public, de retorno tipo “void”, denominado “prePersist” e o faça atribuir a data atual à variável “orderDate” da instância, caso seu valor seja “null”;
+
+10. Adicione a anotação “@Entity” para a classe;
+
+_Isso indica que essa classe representa uma_ _entidade no banco de dados e, então, pode_ _ser mapeada em tabela._
+
+11. Adicione as anotações “@Getter” e “@Setter” para a classe;
+
+_Isso faz com que os métodos “get” e “set” _ _sejam criados implicitamente para todas as_ _variáveis._
+
+12. Adicione a anotação “@NoArgsConstructor” para a classe;
+
+_Isso cria implicitamente o construtor com_ _com campo de parâmetros vazio._
+
+13. Adicione a anotação “@AllArgsConstructor” para a classe;
+
+_Isso cria implicitamente o construtor com_ _campo de parâmetros completo capaz de_ _inicializar todas as variáveis._
+
+14. Caso o IDE não o tenha feito automaticamente, importe as classes “jakarta.persistence.Entity”, “lombok.Getter”, “lombok.Setter”, “lombok.NoArgsConstructor” e “lombok.AllArgsConstructor”;
+
+15. Adicione a anotação “@Id” para a variável “id”;
+
+_Isso indica que essa será a chave primária na_ _tabela do banco de dados._
+
+16. Adicione a anotação “@GeneratedeValue” para a variável “id”, com o argumento “strategy” recebendo “GenerationType.IDENTITY”;
+
+_Isso, junto com o @Id, indica que o “id” será_ _gerado automaticamente pelo banco de da-_ _dos, normalmente usando auto-incremento._
+
+17. Caso o IDE não o tenha feito automaticamente, importe as classes “jakarta.persistence.Id”, “jakarta.persistence.GeneralValue” e “jakarta.persistence.GeneralType”;
+
+18. Adicione a anotação “@NotEmpty” para a variável “clientName”, com o argumento “message”
+
+recebendo uma “String” que informe que o preenchimento do nome é obrigatório;
+
+19. Caso o IDE não o tenha feito automaticamente, importe a classe “jakarta.validation.constraints.NotEmpty”;
+
+20. Adicione a anotação “@DecimalMin” para a variável “totalValue”, com os argumentos “value” recebendo o valor “0.0” e “message” recebendo uma “String” que informe que o valor não pode ser negativo;
+
+21. Adicione a anotação “@Positive” para a variável “totalValue”;
+
+_Isso define que o valor a ser atribuído à va-_ _riável seja maior que zero._
+
+22. Adicione a anotação “@PrePersist” para o método prePersist;
+
+_Isso faz com que esse método seja executa-_ _do antes do objeto ser inserido no banco de_ _dados._
+
+23. Crie um pacote, dentro de “br.com.fiap.checkpoint1”, denominado “repository”;
+
+24. Crie uma interface, dentro de “repository”, denominada “OrderRepository”, que herda de “JpaRepository<>” definindo seus objetos como “OrderModel” e “Long”;
+
+25. Caso o IDE não o tenha feito automaticamente, importe a classe org.springframwork.data.jpa.repository.JpaRepository;
+
+26. Crie um pacote, dentro de “br.com.fiap.checkpoint1”, denominado “service”;
+
+27. Crie uma classe, dentro de “service”, denominada “OrderService”;
+
+28. Crie uma variável, em “OrderService”, com modificador de acesso “private”, do tipo “OrderRepository”, denominada “orderRepository”;
+
+29. Na classe “OrderService”, crie um método, com modificador de acesso “public”, de retorno tipo “OrderModel”, denominado “createOrder”, que tenha um parâmetro do tipo “OrderModel” denominado
+
+“order” e o faça retornar o método “save” com o argumento “order”, da variável “orderRepository”;
+
+30. Na classe “OrderService”, crie um método, com modificador de acesso “public”, de retorno tipo “List<OrderModel>”, denominado “readAllOrders” e o faça retornar o método “findAll” da variável “orderRepository”;
+
+31. Na classe “OrderService”, crie um método, com modificador de acesso “public”, de retorno tipo “OrderModel”, denominado “readOrderById”, que tenha um parâmetro do tipo “Long” denominado “id” e o faça retornar o método “findById” com o argumento “id”, da variável “orderRepository”, caso o “id” exista no banco de dados, caso contrário, o método deve lançar uma exceção do tipo “EntityNotFound”, emitindo uma mensagem que informe que o pedido não foi encontrado;
+
+32. Na classe “OrderService”, crie um método, com modificador de acesso “public”, de retorno tipo “OrderModel”, denominado “updateOrder”, que tenha dois parâmetros, sendo um do tipo “Long” denominado “id” e outro do tipo “OrderModel” denominado “order”. Dentro dele, utilize o método “findById” da variável “orderRepository”, passando o argumento “id”, e aplique o método “map” para manipular o objeto “existingOrder” retornado. No corpo do “map”, atualize os atributos “clientName” e “totalValue” de “existingOrder” com os respectivos valores obtidos dos métodos “getClientName” e “getTotalValue” do objeto “order”. Em seguida, retorne a chamada do método “save”, da variável “orderRepository”, passando como argumento o próprio “existingOrder”. Caso o “id” não seja encontrado no banco de dados, o método deve lançar uma exceção do tipo “EntityNotFoundException” emitindo uma mensagem que informe que o pedido não foi encontrado;
+
+33. Na classe “OrderService”, crie um método, com modificador de acesso “public”, de retorno “void”, denominado “deleteOrderById”, que tenha um parâmetro do tipo “Long” denominado “id”. Dentro do método, utilize uma estrutura “try-catch” para tentar executar o método “deleteById”, da variável “orderRepository”, passando como argumento o valor de “id”. No bloco “catch”, capture a exceção do tipo “EmptyResultDataAccessException” e, ao capturá-la, lance uma nova exceção do tipo “EntityNotFoundException” emitindo uma mensagem que informa que o pedido não foi encontrado;
+
+34. Adicione a anotação “@Service” para a classe;
+
+_Isso indica que essa classe é um componen-_ _te de serviço, contendo a lógica de negócio da aplicação._
+
+35. Adicione a anotação “@Autowired” para a variável “orderRepository”;
+
+_Isso injeta, automaticamente, uma instância_ _do bean “OrderRepository” nesta variável._
+
+36. Caso o IDE não o tenha feito automaticamente, importe as classes “jakarta.persistence.EntityNotFoundException”, “org.springframework.dao.EmptyResultDataAccessException”, “org.springframework.stereotype.Service” e “org.springframework.beans.factory.annotation.Autowired”;
+
+37. Crie um pacote, dentro de “br.com.fiap.checkpoint1”, denominado “controller”;
+
+38. Crie uma classe, dentro de “controller”, denominada “OrderController”;
+
+39. Adicione a anotação “@RestController” à classe;
+
+_Isso indica que essa classe será responsável_ _por responder requisições REST, retornando_ _dados diretamente no corpo da resposta._
+
+40. Adicione a anotação “@RequestMapping”, com o valor “/orders”, sobre a declaração da classe;
+
+_Esse mapeamento define que todos os_ _endpoints da classe responderão a URL’s_ _iniciadas com “/orders”._
+
+41. Crie uma variável, em “OrderController”, com modificador de acesso “private”, do tipo “OrderService”, denominada “orderService”;
+
+42. Adicione a anotação “@Autowired” sobre a variável “orderService”;
+
+_Isso injeta automaticamente uma instância_ _da classe “OrderService”, permitindo o uso_ _de seus métodos._
+
+43. Na classe “OrderController”, crie um método, com modificador de acesso “public”, de retorno tipo “ResponseEntity<Object>”, denominado
+
+“createOrder”, que tenha um parâmetro do tipo “OrderModel” anotado com “@Valid” e “@RequestBody”, denominado “order”. No corpo do método, utilize uma estrutura “try-catch” para capturar possíveis exceções do tipo “IllegalArgumentException”. No bloco “try”, chame o método “createOrder” da variável “orderService” e atribua seu retorno a uma variável do tipo “OrderModel”. Em seguida, retorne um novo objeto “ResponseEntity”, passando como argumentos o “orderModel” e o status “HttpStatus.CREATED”. No bloco “catch”, retorne um novo “ResponseEntity”, passando como argumentos a mensagem da exceção e o status “HttpStatus.BAD_REQUEST”;
+
+44. Adicione a anotação “@PostMapping” sobre o método “createOrder”;
+
+_Isso mapeia requisições “HTTP” do tipo_ _“POST” a um método do controlador._
+
+45. Na classe “OrderController”, crie um método, com modificador de acesso “public”, de retorno tipo “List<OrderModel>”, denominado “readOrders” e o faça retornar o resultado da chamada ao método “readAllOrders” da variável “orderService”;
+
+46. Adicione a anotação “@GetMapping” sobre o método “readOrders”;
+
+_Isso mapeia requisições “HTTP” do tipo_ _“GET” a um método do controlador._
+
+47. Na classe “OrderController”, crie um método, com modificador de acesso “public”, de retorno tipo “ResponseEntity<Object>”, denominado “getOrder”, que tenha um parâmetro do tipo “Long” anotado com “@PathVariable”, denominado “id”. No corpo do método, utilize uma estrutura “try-catch” para capturar exceções do tipo “EntityNotFoundException”. No bloco “try”, chame o método “readOrderById” da variável “orderService”, atribua seu retorno a uma variável do tipo “OrderModel” e retorne um novo “ResponseEntity” com os argumentos “orderModel” e “HttpStatus.OK”. No bloco “catch”, retorne um novo “ResponseEntity” com os argumentos “e.getMessage” e “HttpStatus.NOT_FOUND”;
+
+48. Adicione a anotação “@GetMapping”, com o valor “/{code}”, sobre o método “getOrders”;
+
+_Isso mapeia requisições “HTTP” do tipo_ _“GET” a um método do controlador._
+
+49. Na classe “OrderController”, crie um método, com modificador de acesso “public”, de retorno tipo “ResponseEntity<Object>”, denominado “updateOrder”, que tenha dois parâmetros: um do tipo “Long” anotado com “@PathVariable” denominado “id” e outro do tipo “OrderModel” anotado com “@Valid” e “@RequestBody” denominado “order”. No corpo do método, utilize uma estrutura “try-catch” para capturar exceções do tipo “EntityNotFoundException”. No bloco “try”, chame o método “updateOrder” da variável “orderService” e atribua seu retorno a uma variável do tipo “OrderModel”. Retorne um novo “ResponseEntity”, passando como argumentos “orderModel” e “HttpStatus.OK”. No bloco “catch”, retorne um novo “ResponseEntity”, passando como argumentos “e.getMessage” e “HttpStatus.NOT_FOUND”;
+
+50. Adicione a anotação “@PutMapping”, com o valor “/{code}”, sobre o método “updateOrders”;
+
+_Isso mapeia requisições “HTTP” do tipo_ _“PUT” a um método do controlador._
+
+51. Na classe “OrderController”, crie um método, com modificador de acesso “public”, de retorno tipo “ResponseEntity<Object>”, denominado “deleteOrder”, que tenha um parâmetro do tipo “Long” anotado com “@PathVariable”, denominado “id”. No corpo do método, utilize uma estrutura “try-catch” para capturar exceções do tipo “EntityNotFoundException”. No bloco “try”, chame o método “deleteOrderById” da variável “orderService” e retorne um novo “ResponseEntity” com o status “HttpStatus.NO_CONTENT”. No bloco “catch”, retorne um novo “ResponseEntity”, passando como argumentos “e.getMessage” e “HttpStatus.NOT_FOUND”;
+
+52. Adicione a anotação “@DeleteMapping”, com o valor “/{code}”, sobre o método “updateOrders”;
+
+_Isso mapeia requisições “HTTP” do tipo_ _“DELETE” a um método do controlador._
+
+53. Caso o IDE não o tenha feito automaticamente, importe as classes “br.com.fiap.checkpoint1.model.OrderModel”, “br.com.fiap.checkpoint1.service.OrderService”, “jakarta.validation.Valid”, “jakarta.persistence.EntityNotFoundException”, “org.springframework.beans.factory.annotation.Autowired”, “org.springframework.http.HttpStatus”,
+
+“org.springframework.http.ResponseEntity”, “org.springframework.web.bind.annotation.*” e “java.util.List”;
+
+54. Localize ou crie o arquivo “application.properties”, dentro do diretório “src/main/resources”;
+
+55. Adicione a seguinte propriedade no arquivo: “spring.application.name=Checkpoint1”;
+
+_Esse valor define o nome da aplicação no_ _contexto do Spring._
+
+56. Adicione a seguinte propriedade no arquivo: “server.port=8085”;
+
+_Essa configuração define a porta na qual a_ _aplicação será executada._
+
+57. Adicione as propriedades relacionadas à conexão com o banco de dados H2: “spring.datasource.url=jdbc:h2:file:~/testdb”, “spring.datasource.driverClassName=org.h2.Driver”, “spring.datasource.username=sa” e “spring.datasource.password=password”;
+
+_Essas configurações definem a URL, driver,_ _usuário e senha para o banco de dados_ _embutido H2._
+
+58. Adicione a seguinte propriedade no arquivo: “spring.jpa.database-platform=org.hibernate.dialect.H2Dialect”;
+
+_Essa configuração informa ao JPA qual_ _dialeto utilizar para se comunicar cor-_ _retamente com o banco H2._
+
+59. Adicione a seguinte propriedade no arquivo: “spring.jpa.hibernate.ddl-auto=update”;
+
+_Essa opção permite que o Hibernate atualize_ _automaticamente a estrutura do banco de_ _dados com base nas entidades do projeto._
+
+60. Adicione a seguinte propriedade no arquivo: “spring.jpa.show-sql=true”;
+
+_Essa configuração faz com que as instruções_ _SQL executadas sejam exibidas no console_ _durante a execução da aplicação._
+
+61. Adicione as propriedades para habilitar o console web do banco H2: “spring.h2.console.enabled=true” e “spring.h2.console.path=/h2-console”;
+
+_Essas configurações habilitam e definem o_ _caminho de acesso à interface gráfica do H2_ _no navegador, útil para visualizar e_ _manipular os dados da aplicação durante o_ _desenvolvimento._
+
+62. Retorne à classe “OrderModel” e adicione a anotação “@Table”, com o valor “name” recebendo o nome “Pedidos”, sobre a declaração da classe.
